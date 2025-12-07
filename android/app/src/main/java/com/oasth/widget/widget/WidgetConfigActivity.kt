@@ -7,22 +7,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
-import android.view.View
 import com.oasth.widget.R
-import com.oasth.widget.data.OasthApi
-import com.oasth.widget.data.SessionManager
 import com.oasth.widget.data.WidgetConfig
 import com.oasth.widget.data.WidgetConfigRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.net.URL
 
 /**
  * Configuration activity for setting up a widget's stop code
  */
 class WidgetConfigActivity : AppCompatActivity() {
+    
+    companion object {
+        private const val STATIC_TOKEN = "e2287129f7a2bbae422f3673c4944d703b84a1cf71e189f869de7da527d01137"
+    }
     
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
     private lateinit var configRepo: WidgetConfigRepository
@@ -35,12 +35,10 @@ class WidgetConfigActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config)
         
-        // Set result to canceled in case user backs out
         setResult(RESULT_CANCELED)
         
         configRepo = WidgetConfigRepository(this)
         
-        // Get widget ID from intent
         widgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
@@ -51,12 +49,10 @@ class WidgetConfigActivity : AppCompatActivity() {
             return
         }
         
-        // Initialize views
         stopCodeInput = findViewById(R.id.stop_code_input)
         stopNameInput = findViewById(R.id.stop_name_input)
         saveButton = findViewById(R.id.save_button)
         
-        // Load existing config if reconfiguring
         val existingConfig = configRepo.getConfig(widgetId)
         if (existingConfig != null) {
             stopCodeInput.setText(existingConfig.stopCode)
@@ -77,51 +73,81 @@ class WidgetConfigActivity : AppCompatActivity() {
             return
         }
         
-        // Disable button and show loading
         saveButton.isEnabled = false
-        saveButton.text = getString(R.string.loading)
+        saveButton.text = getString(R.string.fetching_stop_name)
         
-        CoroutineScope(Dispatchers.Main).launch {
-            // If stop name is empty, try to fetch it from API
+        CoroutineScope(Dispatchers.IO).launch {
+            // If stop name is empty, try to fetch it
             if (stopName.isEmpty()) {
-                try {
-                    val sessionManager = SessionManager(applicationContext)
-                    val api = OasthApi(sessionManager)
-                    val fetchedName = api.getStopInfo(stopCode)
-                    if (fetchedName != null) {
-                        stopName = fetchedName
-                        stopNameInput.setText(fetchedName)
-                    }
-                } catch (e: Exception) {
-                    // Ignore, will use default name
+                stopName = fetchStopName(stopCode) ?: "Stop $stopCode"
+            }
+            
+            val finalStopName = stopName
+            
+            CoroutineScope(Dispatchers.Main).launch {
+                stopNameInput.setText(finalStopName)
+                
+                val config = WidgetConfig(
+                    widgetId = widgetId,
+                    stopCode = stopCode,
+                    stopName = finalStopName
+                )
+                configRepo.saveConfig(config)
+                
+                // Trigger widget update
+                val intent = Intent(this@WidgetConfigActivity, BusWidgetProvider::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
                 }
+                sendBroadcast(intent)
+                
+                val resultIntent = Intent().apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+                }
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
+        }
+    }
+    
+    private fun fetchStopName(stopCode: String): String? {
+        return try {
+            val prefs = getSharedPreferences("oasth_session", MODE_PRIVATE)
+            val phpSessionId = prefs.getString("php_session_id", null) ?: return null
+            val token = prefs.getString("token", STATIC_TOKEN) ?: STATIC_TOKEN
             
-            // Use stop code as name if name still not available
-            val displayName = if (stopName.isEmpty()) "Stop $stopCode" else stopName
+            // Try to get stop name from arrivals response
+            val url = URL("https://telematics.oasth.gr/api/?act=getStopArrivals&p1=$stopCode")
+            val connection = url.openConnection() as java.net.HttpURLConnection
             
-            // Save configuration
-            val config = WidgetConfig(
-                widgetId = widgetId,
-                stopCode = stopCode,
-                stopName = displayName
-            )
-            configRepo.saveConfig(config)
+            connection.requestMethod = "GET"
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android)")
+            connection.setRequestProperty("Accept", "application/json")
+            connection.setRequestProperty("X-CSRF-Token", token)
+            connection.setRequestProperty("Cookie", "PHPSESSID=$phpSessionId")
+            connection.setRequestProperty("X-Requested-With", "XMLHttpRequest")
+            connection.connectTimeout = 10000
+            connection.readTimeout = 10000
             
-            // Trigger widget update
-            val appWidgetManager = AppWidgetManager.getInstance(this@WidgetConfigActivity)
-            val intent = Intent(this@WidgetConfigActivity, BusWidgetProvider::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+            if (connection.responseCode == 200) {
+                val response = connection.inputStream.bufferedReader().readText()
+                
+                // Try to extract stop description from response
+                val stopDescrPattern = """"stopDescr"\s*:\s*"([^"]+)"""".toRegex()
+                val match = stopDescrPattern.find(response)
+                
+                if (match != null) {
+                    return match.groupValues[1]
+                }
+                
+                // Fallback: try bstop_descr
+                val bstopPattern = """"bstop_descr"\s*:\s*"([^"]+)"""".toRegex()
+                bstopPattern.find(response)?.groupValues?.get(1)
+            } else {
+                null
             }
-            sendBroadcast(intent)
-            
-            // Return success
-            val resultIntent = Intent().apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-            }
-            setResult(RESULT_OK, resultIntent)
-            finish()
+        } catch (e: Exception) {
+            null
         }
     }
 }

@@ -1,146 +1,136 @@
-# OASTH Bus Widget
+# OASTH Live 🚌
 
-> Universal real-time bus arrival tracker for Thessaloniki (OASTH)
+Real-time bus arrivals for Thessaloniki, Greece — as a home screen widget!
 
-A lightweight, cross-platform library and CLI for fetching live bus arrivals from the OASTH telematics system. Works on **Linux**, **Android**, **iOS**, and more.
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/rlutolli/oasth-tracker?style=flat-square" alt="Release">
+  <img src="https://img.shields.io/github/license/rlutolli/oasth-tracker?style=flat-square" alt="License">
+</p>
 
-![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-universal-brightgreen)
+---
 
-## 🚀 Features
+## 📱 For Users
 
-- **Fast**: 0.7s API calls (vs 5s+ with browser automation)
-- **Lightweight**: ~2MB memory usage
-- **Session Caching**: One-time browser init, cached for 1 hour
-- **Multiple Outputs**: ANSI terminal, JSON, plain text
-- **Cross-Platform**: Python core works anywhere
+### Download & Install
 
-## 📦 Installation
+1. **Download** the latest APK from [Releases](https://github.com/rlutolli/oasth-tracker/releases)
+2. **Install** the APK on your Android phone
+   - You may need to enable "Install from unknown sources"
+3. **Open** the app to establish a session
+4. **Add widget** to your home screen:
+   - Long-press your home screen
+   - Tap "Widgets"
+   - Find "OASTH Live" and drag it
+5. **Configure** with your stop code (e.g., `1029`)
+6. **Tap widget** anytime to refresh!
 
-```bash
-git clone https://github.com/rlutolli/oasth-bus-widget.git
-cd oasth-bus-widget
+### Finding Your Stop Code
 
-python3 -m venv venv
-source venv/bin/activate
+1. Visit [telematics.oasth.gr](https://telematics.oasth.gr/en/)
+2. Search for your bus stop
+3. The stop code is shown on the stop marker
 
-pip install playwright requests
-playwright install firefox
+### Supported Languages
+
+- 🇬🇧 English
+- 🇬🇷 Greek (Ελληνικά)
+
+The app follows your phone's language setting.
+
+---
+
+## 🔧 For Developers
+
+### How It Works
+
+This app reverse-engineers the OASTH telematics API:
+
+1. **Session**: A hidden WebView visits the OASTH site to get a `PHPSESSID` cookie and CSRF token
+2. **API Calls**: Native HTTP requests with the session credentials fetch real-time arrivals
+3. **Widget**: `AppWidgetProvider` with `Executor` pattern for background work
+
+### API Endpoints
+
+```
+GET https://telematics.oasth.gr/api/?act=getStopArrivals&p1={stopCode}
+
+Headers:
+  Cookie: PHPSESSID={sessionId}
+  X-CSRF-Token: {token}
+  X-Requested-With: XMLHttpRequest
 ```
 
-## 🔧 CLI Usage
+### Project Structure
+
+```
+android/
+├── app/src/main/java/com/oasth/widget/
+│   ├── data/
+│   │   ├── Models.kt          # Data classes
+│   │   ├── SessionManager.kt  # WebView session handling
+│   │   ├── OasthApi.kt        # HTTP API client
+│   │   └── WidgetConfigRepository.kt
+│   ├── widget/
+│   │   ├── BusWidgetProvider.kt  # Home screen widget
+│   │   └── WidgetConfigActivity.kt
+│   └── ui/
+│       └── MainActivity.kt
+├── res/
+│   ├── values/strings.xml     # English strings
+│   ├── values-el/strings.xml  # Greek strings
+│   └── layout/
+└── build.gradle.kts
+```
+
+### Building
 
 ```bash
-# Get arrivals for a stop (ANSI colored output)
-python cli.py --stop 1029 --stop-name "ESPEROS"
+cd android
+./gradlew assembleDebug
+# APK at: app/build/outputs/apk/debug/app-debug.apk
+```
 
-# JSON output (for mobile apps/widgets)
-python cli.py --stop 1052 --format json
+### Key Learnings
 
-# Plain text
-python cli.py --stop 1049 --format plain
+- **RemoteViews limitations**: Only supports specific layouts (`LinearLayout`, `RelativeLayout`, etc.) and widgets (`TextView`, `ImageView`, `Button`). NO plain `<View>` elements!
+- **Widget async**: Use `Executor` + `Handler` pattern, NOT coroutines in `AppWidgetProvider`
+- **Samsung quirks**: Test on Samsung devices - they have stricter widget requirements
+
+---
+
+## 📋 Python CLI (Bonus)
+
+A Python CLI is also included for desktop/terminal use:
+
+```bash
+# Install dependencies
+pip install requests playwright
+playwright install firefox
+
+# Get arrivals for a stop
+python cli.py --stop 1029
 
 # List all bus lines
 python cli.py --lines
-
-# Clear session cache
-python cli.py --clear-cache
 ```
 
-## 🐍 Python API
-
-```python
-from core import get_arrivals, OasthAPI
-
-# Quick function
-arrivals = get_arrivals("1029")
-for bus in arrivals:
-    print(f"Line {bus.line_id}: {bus.estimated_minutes} min")
-
-# Full API
-api = OasthAPI()
-lines = api.get_lines()
-arrivals = api.get_arrivals("1052")
-```
-
-## 🖥️ Platform Integration
-
-### Linux (KDE/GNOME/Polybar/Conky)
-
-**KDE Plasma Widget:**
-```bash
-/path/to/venv/bin/python3 /path/to/cli.py --stop 1029
-```
-Set "Run Every" to 60 seconds. Use monospaced font.
-
-**Polybar Module:**
-```ini
-[module/bus]
-type = custom/script
-exec = /path/to/venv/bin/python3 /path/to/cli.py --stop 1029 --format plain
-interval = 60
-```
-
-### Android & iOS
-
-Two approaches:
-
-1. **Local Server** (Recommended for home use)
-   - Run Python server on home PC/Raspberry Pi
-   - Mobile app fetches JSON from `http://your-ip:8080/arrivals/1029`
-   
-2. **WebView Session** (Standalone app)
-   - Hidden WebView loads OASTH site once
-   - Extract session cookies, use native HTTP
-
-**JSON endpoint for mobile:**
-```bash
-python cli.py --stop 1029 --format json
-```
-
-Returns:
-```json
-[
-  {"line": "01", "description": "...", "minutes": 5, "vehicle": "1234"},
-  {"line": "31", "description": "...", "minutes": 12, "vehicle": "5678"}
-]
-```
-
-## 📁 Project Structure
-
-```
-oasth-bus-widget/
-├── core/
-│   ├── session.py    # Session management + caching
-│   ├── api.py        # Pure HTTP API client
-│   └── models.py     # Data structures
-├── cli.py            # Command-line interface
-├── bus_timer.py      # Legacy KDE widget script
-└── README.md
-```
-
-## 🔬 How It Works
-
-1. **Session Init** (once per hour): Headless Firefox extracts `PHPSESSID` + `token`
-2. **Cache**: Credentials stored in `~/.cache/oasth_widget/session.json`
-3. **Fast API**: Pure HTTP with cached credentials (~0.7s per call)
-
-## 🚍 Finding Stop Codes
-
-Use the official OASTH app or website to find stop codes. Example stops:
-- `1029` - ESPEROS
-- `1052` - KAMARA
-- `1049` - IASONIDOU
+---
 
 ## 🤝 Contributing
 
-Contributions welcome! Areas to help:
-- [ ] Android Kotlin wrapper
-- [ ] iOS Swift wrapper
-- [ ] Server mode (Flask/FastAPI)
-- [ ] Homebridge/Home Assistant integration
+Pull requests welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Add translations
 
-## 📄 License
+---
 
-MIT License - See [LICENSE](LICENSE)
+## 📜 License
+
+MIT License — see [LICENSE](LICENSE)
+
+---
+
+<p align="center">
+  Made with ♥ by a fellow duo enthusiast
+</p>
