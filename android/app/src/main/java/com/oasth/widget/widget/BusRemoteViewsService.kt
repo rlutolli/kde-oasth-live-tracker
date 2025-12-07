@@ -99,6 +99,9 @@ class BusRemoteViewsFactory(
             // Line number (e.g., "14A", "31", "02K")
             setTextViewText(R.id.item_line, arrival.displayLine)
             
+            // Destination from API (e.g., "ΧΑΡΙΛΑΟΥ-Ν.Σ.", "ΠΥΛΑΙΑ - Ν.Σ.")
+            setTextViewText(R.id.item_destination, arrival.lineDescr)
+            
             // Arrival time - simple format: "2'" or "NOW"
             val timeText = when {
                 arrival.estimatedMinutes <= 0 -> "NOW"

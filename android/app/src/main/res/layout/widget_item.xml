@@ -3,34 +3,55 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="4dp"
-    android:gravity="center_vertical">
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="4dp"
+    android:gravity="center_vertical"
+    android:background="#111111">
 
-    <!-- Line number (bright amber, bold) -->
+    <!-- Line number (bold amber, fixed width) -->
     <TextView
         android:id="@+id/item_line"
-        android:layout_width="wrap_content"
+        android:layout_width="44dp"
         android:layout_height="wrap_content"
-        android:minWidth="48dp"
-        android:textColor="#FFA500"
-        android:textSize="18sp"
+        android:textColor="#FFAA00"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="monospace" />
 
-    <!-- Spacer -->
-    <View
+    <!-- Destination (amber, fills middle space) -->
+    <TextView
+        android:id="@+id/item_destination"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="4dp"
+        android:textColor="#FFAA00"
+        android:textSize="18sp"
+        android:fontFamily="monospace"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
-    <!-- Arrival time (golden yellow) -->
+    <!-- Arrival indicator Σ -->
+    <TextView
+        android:id="@+id/item_sigma"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Σ"
+        android:textColor="#FFAA00"
+        android:textSize="18sp"
+        android:fontFamily="monospace"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
+
+    <!-- Arrival time -->
     <TextView
         android:id="@+id/item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFD700"
+        android:textColor="#FFAA00"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:fontFamily="monospace" />
+        android:fontFamily="monospace"
+        android:minWidth="36dp"
+        android:gravity="end" />
 
 </LinearLayout>
