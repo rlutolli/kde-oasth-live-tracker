@@ -21,7 +21,7 @@ import java.net.URL
 class MainActivity : AppCompatActivity() {
     
     companion object {
-        private const val CURRENT_VERSION = "1.2.0"
+        private const val CURRENT_VERSION = "2.2.0"
         private const val GITHUB_API = "https://api.github.com/repos/rlutolli/oasth-tracker/releases/latest"
         private const val GITHUB_RELEASES = "https://github.com/rlutolli/oasth-tracker/releases"
     }
