@@ -8,52 +8,36 @@
     android:gravity="center_vertical"
     android:background="#111111">
 
-    <!-- Line number (bold amber, fixed width) -->
-    <TextView
-        android:id="@+id/item_line"
+    <!-- Line number (Bitmap) -->
+    <ImageView
+        android:id="@+id/img_line"
         android:layout_width="44dp"
-        android:layout_height="wrap_content"
-        android:textColor="#FFAA00"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/vt323_regular" />
+        android:layout_height="30dp"
+        android:scaleType="fitCenter" />
 
-    <!-- Destination (amber, fills middle space) -->
-    <TextView
-        android:id="@+id/item_destination"
+    <!-- Destination (Bitmap) -->
+    <ImageView
+        android:id="@+id/img_destination"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_weight="1"
         android:layout_marginStart="4dp"
-        android:textColor="#FFAA00"
-        android:textSize="22sp"
-        android:fontFamily="@font/vt323_regular"
-        android:singleLine="true"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:scrollHorizontally="true" />
+        android:scaleType="fitCenter" />
 
-    <!-- Arrival indicator Σ -->
-    <TextView
-        android:id="@+id/item_sigma"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Σ"
-        android:textColor="#FFAA00"
-        android:textSize="22sp"
-        android:fontFamily="@font/vt323_regular"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp" />
+    <!-- Arrival indicator Σ (Bitmap) -->
+    <ImageView
+        android:id="@+id/img_sigma"
+        android:layout_width="20dp"
+        android:layout_height="30dp"
+        android:scaleType="fitCenter"
+        android:paddingHorizontal="2dp" />
 
-    <!-- Arrival time -->
-    <TextView
-        android:id="@+id/item_time"
+    <!-- Arrival time (Bitmap) -->
+    <ImageView
+        android:id="@+id/img_time"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFAA00"
-        android:textSize="22sp"
-        android:fontFamily="@font/vt323_regular"
+        android:layout_height="30dp"
         android:minWidth="36dp"
-        android:gravity="end" />
+        android:scaleType="fitEnd" />
 
 </LinearLayout>

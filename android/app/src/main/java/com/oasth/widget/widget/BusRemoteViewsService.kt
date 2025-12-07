@@ -3,9 +3,14 @@ package com.oasth.widget.widget
 import android.content.Context
 import android.content.Intent
 import android.appwidget.AppWidgetManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import androidx.core.content.res.ResourcesCompat
 import com.oasth.widget.R
 import com.oasth.widget.data.BusArrival
 import com.oasth.widget.data.OasthApi
@@ -53,8 +58,52 @@ class BusRemoteViewsFactory(
     private val stopRepo = StopRepository(context)
     private val lineRepo = LineRepository(context)
     
+    private var customTypeface: Typeface? = null
+    
     override fun onCreate() {
         Log.d(TAG, "onCreate for widget $appWidgetId")
+        try {
+            // Load VT323 font directly from assets
+            customTypeface = Typeface.createFromAsset(context.assets, "vt323_regular.ttf")
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not load font: ${e.message}")
+        }
+    }
+    
+    private fun textAsBitmap(text: String, sizeSp: Float, color: Int, maxWidthDp: Int? = null): Bitmap {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.textSize = sizeSp * context.resources.displayMetrics.scaledDensity
+        paint.color = color
+        paint.typeface = customTypeface ?: Typeface.MONOSPACE
+        
+        // Measure text
+        var textWidth = paint.measureText(text)
+        val textBounds = android.graphics.Rect()
+        paint.getTextBounds(text, 0, text.length, textBounds)
+        val textHeight = textBounds.height()
+        
+        // Scale down if maxWidth is provided and text is too wide (e.g. "01M")
+        if (maxWidthDp != null) {
+            val validWidthPx = maxWidthDp * context.resources.displayMetrics.density
+            if (textWidth > validWidthPx) {
+                val scale = validWidthPx / textWidth
+                paint.textSize *= scale
+                textWidth = paint.measureText(text) // Re-measure
+            }
+        }
+        
+        // Add some padding to height to avoid cutting off descenders
+        val height = (paint.textSize * 1.2).toInt()
+        val width = textWidth.toInt().coerceAtLeast(1)
+        
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        
+        // Draw text centered vertically-ish (baseline)
+        val baseline = height - (height - textHeight) / 2f - paint.descent() / 2f
+        canvas.drawText(text, 0f, baseline + paint.textSize * 0.2f, paint) // Adjust baseline slightly
+        
+        return bitmap
     }
     
     override fun onDataSetChanged() {
@@ -98,22 +147,28 @@ class BusRemoteViewsFactory(
         val arrival = arrivals[position]
         
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            // Line number (e.g., "14A", "31", "02K")
-            setTextViewText(R.id.item_line, arrival.displayLine)
+            val color = 0xFFFFAA00.toInt()
             
-            // Destination from API (e.g., "ΧΑΡΙΛΑΟΥ-Ν.Σ.") or fallback
+            // Line number (e.g., "14A", "31", "02K")
+            // Pass maxWidthDp=44 to ensure it fits (scales down if needed)
+            setImageViewBitmap(R.id.img_line, textAsBitmap(arrival.displayLine, 24f, color, 44))
+            
+            // Destination
             var destination = arrival.lineDescr
             if (destination.isEmpty()) {
                 destination = lineRepo.getLineDescription(arrival.displayLine) ?: ""
             }
-            setTextViewText(R.id.item_destination, destination)
+            setImageViewBitmap(R.id.img_destination, textAsBitmap(destination, 22f, color))
             
-            // Arrival time - simple format: "2'" or "NOW"
+            // Sigma
+            setImageViewBitmap(R.id.img_sigma, textAsBitmap("Σ", 22f, color))
+            
+            // Time
             val timeText = when {
                 arrival.estimatedMinutes <= 0 -> "NOW"
                 else -> "${arrival.estimatedMinutes}'"
             }
-            setTextViewText(R.id.item_time, timeText)
+            setImageViewBitmap(R.id.img_time, textAsBitmap(timeText, 22f, color))
         }
     }
     
