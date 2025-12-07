@@ -56,12 +56,8 @@ class BusWidgetProvider : AppWidgetProvider() {
             
             Log.d(TAG, "Config: stopCode=${config.stopCode}, name=${config.stopName}")
             
-            // Get stop name from repository if not already set
-            val stopName = if (config.stopName.isNotEmpty()) {
-                config.stopName
-            } else {
-                stopRepo.getStopName(config.stopCode) ?: config.stopCode
-            }
+// Stop name logic: Only show if explicitly set by user
+            val stopName = config.stopName
             
             // Set up RemoteViews with adapter for ListView
             val intent = Intent(context, BusRemoteViewsService::class.java).apply {
@@ -71,7 +67,13 @@ class BusWidgetProvider : AppWidgetProvider() {
             
             val views = RemoteViews(context.packageName, R.layout.widget_bus)
             views.setTextViewText(R.id.widget_stop_code, config.stopCode)
-            views.setTextViewText(R.id.widget_stop_name, stopName)
+            
+            if (stopName.isNotEmpty()) {
+                views.setTextViewText(R.id.widget_stop_name, stopName)
+                views.setViewVisibility(R.id.widget_stop_name, android.view.View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.widget_stop_name, android.view.View.GONE)
+            }
             views.setRemoteAdapter(R.id.widget_list, intent)
             views.setEmptyView(R.id.widget_list, R.id.widget_empty)
             

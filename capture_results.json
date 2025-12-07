@@ -1,0 +1,166 @@
+{
+  "cookies": {
+    "PHPSESSID": "ei3la6cb5q75sdhovrlcnu1si5",
+    "_ga": "GA1.1.685656019.1765065563",
+    "_ga_L492Z0RV7F": "GS2.1.s1765065562$o1$g0$t1765065562$j60$l0$h0"
+  },
+  "headers_seen": {
+    "host": [
+      "www.googletagmanager.com",
+      "fonts.googleapis.com",
+      "region1.google-analytics.com",
+      "telematics.oasth.gr"
+    ],
+    "connection": [
+      "keep-alive"
+    ],
+    "upgrade-insecure-requests": [
+      "1"
+    ],
+    "sec-fetch-dest": [
+      "document",
+      "empty",
+      "font",
+      "script",
+      "image"
+    ],
+    "sec-fetch-mode": [
+      "no-cors",
+      "navigate",
+      "cors"
+    ],
+    "sec-fetch-site": [
+      "same-origin",
+      "cross-site",
+      "none"
+    ],
+    "sec-fetch-user": [
+      "?1"
+    ],
+    "referer": [
+      "https://telematics.oasth.gr/components/bootstrap/css/bootstrap.min.css",
+      "https://telematics.oasth.gr/en/",
+      "https://telematics.oasth.gr/"
+    ],
+    "x-requested-with": [
+      "XMLHttpRequest"
+    ],
+    "origin": [
+      "https://telematics.oasth.gr"
+    ],
+    "cookie": [
+      "PHPSESSID=ei3la6cb5q75sdhovrlcnu1si5; _ga_L492Z0RV7F=GS2.1.s1765065562$o1$g0$t1765065562$j60$l0$h0; _ga=GA1.1.685656019.1765065563",
+      "PHPSESSID=ei3la6cb5q75sdhovrlcnu1si5"
+    ],
+    "alt-used": [
+      "region1.google-analytics.com"
+    ]
+  },
+  "api_calls": [
+    {
+      "url": "https://telematics.oasth.gr/api/?act=isProduction",
+      "method": "GET",
+      "headers": {
+        "host": "telematics.oasth.gr",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.5",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "x-requested-with": "XMLHttpRequest",
+        "connection": "keep-alive",
+        "referer": "https://telematics.oasth.gr/en/",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin"
+      },
+      "post_data": null,
+      "resource_type": "xhr",
+      "timestamp": "2025-12-07 01:59:22.217761"
+    },
+    {
+      "url": "https://telematics.oasth.gr/api/?act=webGetLangs",
+      "method": "POST",
+      "headers": {
+        "host": "telematics.oasth.gr",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.5",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "origin": "https://telematics.oasth.gr",
+        "connection": "keep-alive",
+        "referer": "https://telematics.oasth.gr/en/",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin"
+      },
+      "post_data": null,
+      "resource_type": "xhr",
+      "timestamp": "2025-12-07 01:59:22.275527"
+    },
+    {
+      "url": "https://telematics.oasth.gr/api/?act=webGetLinesWithMLInfo",
+      "method": "POST",
+      "headers": {
+        "host": "telematics.oasth.gr",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.5",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "origin": "https://telematics.oasth.gr",
+        "connection": "keep-alive",
+        "referer": "https://telematics.oasth.gr/en/",
+        "cookie": "PHPSESSID=ei3la6cb5q75sdhovrlcnu1si5",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin"
+      },
+      "post_data": null,
+      "resource_type": "xhr",
+      "timestamp": "2025-12-07 01:59:22.584741"
+    },
+    {
+      "url": "https://telematics.oasth.gr/api/?act=webGetLines",
+      "method": "POST",
+      "headers": {
+        "host": "telematics.oasth.gr",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.5",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "origin": "https://telematics.oasth.gr",
+        "connection": "keep-alive",
+        "referer": "https://telematics.oasth.gr/en/",
+        "cookie": "PHPSESSID=ei3la6cb5q75sdhovrlcnu1si5",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin"
+      },
+      "post_data": null,
+      "resource_type": "xhr",
+      "timestamp": "2025-12-07 01:59:22.607038"
+    },
+    {
+      "url": "https://telematics.oasth.gr/api/?act=getStopBySIP&sip=3344",
+      "method": "POST",
+      "headers": {
+        "host": "telematics.oasth.gr",
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+        "accept": "application/json, text/javascript, */*; q=0.01",
+        "accept-language": "en-US,en;q=0.5",
+        "accept-encoding": "gzip, deflate, br, zstd",
+        "origin": "https://telematics.oasth.gr",
+        "connection": "keep-alive",
+        "referer": "https://telematics.oasth.gr/en/",
+        "cookie": "PHPSESSID=ei3la6cb5q75sdhovrlcnu1si5; _ga_L492Z0RV7F=GS2.1.s1765065562$o1$g0$t1765065562$j60$l0$h0; _ga=GA1.1.685656019.1765065563",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin"
+      },
+      "post_data": null,
+      "resource_type": "xhr",
+      "timestamp": "2025-12-07 01:59:26.957011"
+    }
+  ],
+  "request_count": 25,
+  "response_count": 25
+}

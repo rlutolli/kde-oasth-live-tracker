@@ -9,6 +9,7 @@ import android.widget.RemoteViewsService
 import com.oasth.widget.R
 import com.oasth.widget.data.BusArrival
 import com.oasth.widget.data.OasthApi
+import com.oasth.widget.data.LineRepository
 import com.oasth.widget.data.SessionManager
 import com.oasth.widget.data.StopRepository
 import com.oasth.widget.data.WidgetConfigRepository
@@ -50,6 +51,7 @@ class BusRemoteViewsFactory(
     private val api = OasthApi(sessionManager)
     private val configRepo = WidgetConfigRepository(context)
     private val stopRepo = StopRepository(context)
+    private val lineRepo = LineRepository(context)
     
     override fun onCreate() {
         Log.d(TAG, "onCreate for widget $appWidgetId")
@@ -99,8 +101,12 @@ class BusRemoteViewsFactory(
             // Line number (e.g., "14A", "31", "02K")
             setTextViewText(R.id.item_line, arrival.displayLine)
             
-            // Destination from API (e.g., "ΧΑΡΙΛΑΟΥ-Ν.Σ.", "ΠΥΛΑΙΑ - Ν.Σ.")
-            setTextViewText(R.id.item_destination, arrival.lineDescr)
+            // Destination from API (e.g., "ΧΑΡΙΛΑΟΥ-Ν.Σ.") or fallback
+            var destination = arrival.lineDescr
+            if (destination.isEmpty()) {
+                destination = lineRepo.getLineDescription(arrival.displayLine) ?: ""
+            }
+            setTextViewText(R.id.item_destination, destination)
             
             // Arrival time - simple format: "2'" or "NOW"
             val timeText = when {

@@ -77,10 +77,10 @@ class WidgetConfigActivity : AppCompatActivity() {
         saveButton.text = getString(R.string.fetching_stop_name)
         
         CoroutineScope(Dispatchers.IO).launch {
-            // If stop name is empty, try to fetch it
-            if (stopName.isEmpty()) {
-                stopName = fetchStopName(stopCode) ?: "Stop $stopCode"
-            }
+// Logic removed to allow saving empty name
+            // if (stopName.isEmpty()) {
+            //    stopName = fetchStopName(stopCode) ?: "Stop $stopCode"
+            // }
             
             val finalStopName = stopName
             

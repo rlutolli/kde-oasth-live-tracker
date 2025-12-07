@@ -1,0 +1,31 @@
+conky.config = {
+    -- Position
+    alignment = 'top_right',
+    gap_x = 20,
+    gap_y = 50,
+
+    -- Window Settings (Transparent)
+    own_window = true,
+    own_window_type = 'dock', -- Keeps it on desktop
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+    own_window_transparent = false,
+    own_window_argb_visual = true,
+    own_window_argb_value = 100, -- Dark glass effect (0-255)
+    own_window_colour = '#000000',
+    double_buffer = true,
+
+    -- Font & Color
+    use_xft = true,
+    font = 'Noto Sans:size=10',
+    default_color = 'white',
+    
+    -- Update Interval (matches your python script)
+    update_interval = 60,
+}
+
+conky.text = [[
+${font Noto Sans:bold:size=14}${color #3daee9}BUS SCHEDULE${color}${font}
+${voffset 5}${hr 2}
+${voffset 5}
+${font Noto Sans:size=12}${execpi 60 /home/rlutolli/oasth_widget/venv/bin/python3 /home/rlutolli/oasth_widget/bus_timer.py}
+]]
