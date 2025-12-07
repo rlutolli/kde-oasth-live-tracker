@@ -3,40 +3,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingVertical="3dp"
+    android:paddingVertical="4dp"
     android:gravity="center_vertical">
 
-    <!-- Line number (amber) -->
+    <!-- Line number (bright amber, bold) -->
     <TextView
         android:id="@+id/item_line"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="48dp"
         android:textColor="#FFA500"
-        android:textSize="14sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:fontFamily="monospace" />
 
-    <!-- Destination (orange-white) -->
-    <TextView
-        android:id="@+id/item_destination"
+    <!-- Spacer -->
+    <View
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="#FFD080"
-        android:textSize="12sp"
-        android:fontFamily="monospace"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        android:layout_height="1dp"
+        android:layout_weight="1" />
 
-    <!-- Arrival time (bright amber) -->
+    <!-- Arrival time (golden yellow) -->
     <TextView
         android:id="@+id/item_time"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFD700"
-        android:textSize="14sp"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:gravity="end"
         android:fontFamily="monospace" />
 
 </LinearLayout>
