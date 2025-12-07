@@ -50,4 +50,5 @@
     <string name="header_line">ΓΡΑΜΜΗ</string>
     <string name="header_destination">ΠΡΟΟΡΙΣΜΟΣ</string>
     <string name="header_arrival">ΑΦΙΞΗ</string>
+    <string name="header_line_dest">ΓΡΑΜΜΗ ΠΡΟΟΡΙΣΜΟΣ</string>
 </resources>
