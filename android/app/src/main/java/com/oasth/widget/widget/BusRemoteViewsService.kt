@@ -48,6 +48,7 @@ class BusRemoteViewsFactory(
     private val sessionManager = SessionManager(context)
     private val api = OasthApi(sessionManager)
     private val configRepo = WidgetConfigRepository(context)
+    private val stopRepo = StopRepository(context)
     
     override fun onCreate() {
         Log.d(TAG, "onCreate for widget $appWidgetId")
@@ -64,11 +65,13 @@ class BusRemoteViewsFactory(
             return
         }
         
-        Log.d(TAG, "Fetching arrivals for stop: ${config.stopCode}")
+        // Convert Street ID to API ID using StopRepository
+        val apiId = stopRepo.getApiId(config.stopCode)
+        Log.d(TAG, "Fetching arrivals for stop: ${config.stopCode} -> API ID: $apiId")
         
         try {
             val result = runBlocking {
-                api.getArrivals(config.stopCode)
+                api.getArrivals(apiId)
             }
             
             Log.d(TAG, "Got ${result.size} arrivals")
