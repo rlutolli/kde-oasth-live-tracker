@@ -179,7 +179,7 @@ class BusRemoteViewsFactory(
                 arrival.estimatedMinutes <= 0 -> "NOW"
                 else -> "Σ ${arrival.estimatedMinutes}'"
             }
-            setImageViewBitmap(R.id.img_time, textAsBitmap(timeText, 22f, color, 60))
+            setImageViewBitmap(R.id.img_time, textAsBitmap(timeText, 24f, color, null))
         }
     }
     
