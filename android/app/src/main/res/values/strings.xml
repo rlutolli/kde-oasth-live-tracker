@@ -45,4 +45,9 @@
     <!-- Credits -->
     <string name="credits">Made with ♥ by a fellow duo enthusiast</string>
     <string name="credits_subtitle">Open source on GitHub</string>
+    
+    <!-- Widget Headers (LED style) -->
+    <string name="header_line">LINE</string>
+    <string name="header_destination">DESTINATION</string>
+    <string name="header_arrival">ARR</string>
 </resources>

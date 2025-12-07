@@ -9,6 +9,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
 import com.oasth.widget.R
+import com.oasth.widget.data.StopRepository
 import com.oasth.widget.data.WidgetConfigRepository
 
 /**
@@ -28,12 +29,14 @@ class BusWidgetProvider : AppWidgetProvider() {
             Log.d(TAG, "updateAppWidget: $appWidgetId")
             
             val configRepo = WidgetConfigRepository(context)
+            val stopRepo = StopRepository(context)
             val config = configRepo.getConfig(appWidgetId)
             
             if (config == null) {
                 Log.w(TAG, "No config for widget $appWidgetId")
                 val views = RemoteViews(context.packageName, R.layout.widget_bus)
                 views.setTextViewText(R.id.widget_stop_name, context.getString(R.string.tap_to_configure))
+                views.setTextViewText(R.id.widget_stop_code, "")
                 views.setTextViewText(R.id.widget_empty, context.getString(R.string.tap_to_configure))
                 
                 // Tap to configure
@@ -53,6 +56,13 @@ class BusWidgetProvider : AppWidgetProvider() {
             
             Log.d(TAG, "Config: stopCode=${config.stopCode}, name=${config.stopName}")
             
+            // Get stop name from repository if not already set
+            val stopName = if (config.stopName.isNotEmpty()) {
+                config.stopName
+            } else {
+                stopRepo.getStopName(config.stopCode) ?: config.stopCode
+            }
+            
             // Set up RemoteViews with adapter for ListView
             val intent = Intent(context, BusRemoteViewsService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -60,7 +70,8 @@ class BusWidgetProvider : AppWidgetProvider() {
             }
             
             val views = RemoteViews(context.packageName, R.layout.widget_bus)
-            views.setTextViewText(R.id.widget_stop_name, config.stopName)
+            views.setTextViewText(R.id.widget_stop_code, config.stopCode)
+            views.setTextViewText(R.id.widget_stop_name, stopName)
             views.setRemoteAdapter(R.id.widget_list, intent)
             views.setEmptyView(R.id.widget_list, R.id.widget_empty)
             

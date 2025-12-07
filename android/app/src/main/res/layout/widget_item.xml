@@ -3,35 +3,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingHorizontal="4dp"
-    android:paddingVertical="4dp"
+    android:paddingVertical="3dp"
     android:gravity="center_vertical">
 
-    <!-- Line ID with emphasis -->
+    <!-- Line number (amber) -->
     <TextView
         android:id="@+id/item_line"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:textColor="#FFD54F"
+        android:textColor="#FFA500"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:minWidth="48dp" />
+        android:fontFamily="monospace" />
 
-    <!-- Separator -->
+    <!-- Destination (orange-white) -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/item_destination"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="  -  "
-        android:textColor="#80FFFFFF"
-        android:textSize="14sp" />
+        android:layout_weight="1"
+        android:textColor="#FFD080"
+        android:textSize="12sp"
+        android:fontFamily="monospace"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
-    <!-- Arrival time -->
+    <!-- Arrival time (bright amber) -->
     <TextView
         android:id="@+id/item_time"
-        android:layout_width="wrap_content"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:textColor="#4FC3F7"
+        android:textColor="#FFD700"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:gravity="end"
+        android:fontFamily="monospace" />
 
 </LinearLayout>

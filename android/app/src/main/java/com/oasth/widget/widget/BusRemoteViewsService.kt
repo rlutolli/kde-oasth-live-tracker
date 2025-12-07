@@ -96,9 +96,24 @@ class BusRemoteViewsFactory(
         val arrival = arrivals[position]
         
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            // Show line ID (or route code) and arrival time
+            // Line number (e.g., "10", "31")
             setTextViewText(R.id.item_line, arrival.displayLine)
-            setTextViewText(R.id.item_time, "${arrival.estimatedMinutes}'")
+            
+            // Destination - use lineDescr if available, otherwise show route code
+            val destination = if (arrival.lineDescr.isNotEmpty()) {
+                arrival.lineDescr.uppercase()
+            } else {
+                arrival.routeCode
+            }
+            setTextViewText(R.id.item_destination, destination)
+            
+            // Arrival time (e.g., "Σ 1'" like real display)
+            val timeText = if (arrival.estimatedMinutes == 0) {
+                "Σ 0'"
+            } else {
+                "Σ ${arrival.estimatedMinutes}'"
+            }
+            setTextViewText(R.id.item_time, timeText)
         }
     }
     

@@ -9,6 +9,7 @@ import java.io.InputStreamReader
 
 /**
  * Repository for resolving Street IDs (visible on signs) to API IDs (for getStopArrivals).
+ * Also provides stop names for display.
  * 
  * stops.json structure:
  * {
@@ -22,38 +23,42 @@ import java.io.InputStreamReader
  */
 class StopRepository(private val context: Context) {
 
-    // Map: Street ID (e.g., "1403") -> First API ID (e.g., "1306")
-    private var stopMap: Map<String, String>? = null
+    // Map: Street ID -> API ID
+    private var apiIdMap: Map<String, String>? = null
+    
+    // Map: Street ID -> Stop Description
+    private var stopNameMap: Map<String, String>? = null
 
     /**
-     * Resolves a Street ID (user-visible, e.g., "1403") to an API ID (for getStopArrivals, e.g., "1306").
-     * If input is not found in the map, returns the input as-is.
+     * Resolves a Street ID to an API ID for getStopArrivals.
      */
     fun getApiId(streetId: String): String {
         ensureLoaded()
         
-        val apiId = stopMap?.get(streetId)
+        val apiId = apiIdMap?.get(streetId)
         if (apiId != null) {
-            Log.d("StopRepository", "Mapped StreetID $streetId -> API ID $apiId")
+            Log.d(TAG, "Mapped StreetID $streetId -> API ID $apiId")
             return apiId
         }
         
-        Log.d("StopRepository", "No mapping for $streetId, assuming it's already an API ID")
+        Log.d(TAG, "No mapping for $streetId, assuming it's already an API ID")
         return streetId
     }
-
+    
     /**
-     * @deprecated Use getApiId instead. Kept for backward compatibility.
+     * Gets the stop name/description for a Street ID.
      */
-    fun getInternalId(inputCode: String): String {
-        return getApiId(inputCode)
+    fun getStopName(streetId: String): String? {
+        ensureLoaded()
+        return stopNameMap?.get(streetId)
     }
 
     private fun ensureLoaded() {
-        if (stopMap != null) return
+        if (apiIdMap != null) return
         
-        Log.d("StopRepository", "Loading stops.json...")
-        val map = mutableMapOf<String, String>()
+        Log.d(TAG, "Loading stops.json...")
+        val apiMap = mutableMapOf<String, String>()
+        val nameMap = mutableMapOf<String, String>()
         
         try {
             val assetManager = context.assets
@@ -71,17 +76,28 @@ class StopRepository(private val context: Context) {
                 // Get the first API_ID from the array
                 val apiIdsArray: JSONArray? = stopObject.optJSONArray("API_IDs")
                 if (apiIdsArray != null && apiIdsArray.length() > 0) {
-                    val firstApiId = apiIdsArray.getString(0)
-                    map[streetId] = firstApiId
+                    apiMap[streetId] = apiIdsArray.getString(0)
+                }
+                
+                // Get stop description
+                val stopDescr = stopObject.optString("StopDescr", "")
+                if (stopDescr.isNotEmpty()) {
+                    nameMap[streetId] = stopDescr
                 }
             }
             
-            stopMap = map
-            Log.d("StopRepository", "Loaded ${map.size} stops")
+            apiIdMap = apiMap
+            stopNameMap = nameMap
+            Log.d(TAG, "Loaded ${apiMap.size} stops, ${nameMap.size} names")
             
         } catch (e: Exception) {
-            Log.e("StopRepository", "Error loading stops.json: ${e.message}")
-            stopMap = emptyMap()
+            Log.e(TAG, "Error loading stops.json: ${e.message}")
+            apiIdMap = emptyMap()
+            stopNameMap = emptyMap()
         }
+    }
+    
+    companion object {
+        private const val TAG = "StopRepository"
     }
 }
