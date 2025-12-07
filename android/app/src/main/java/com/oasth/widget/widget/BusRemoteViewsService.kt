@@ -92,8 +92,8 @@ class BusRemoteViewsFactory(
         val arrival = arrivals[position]
         
         return RemoteViews(context.packageName, R.layout.widget_item).apply {
-            // Show line ID and arrival time
-            setTextViewText(R.id.item_line, arrival.lineId)
+            // Show line ID (or route code) and arrival time
+            setTextViewText(R.id.item_line, arrival.displayLine)
             setTextViewText(R.id.item_time, "${arrival.estimatedMinutes}'")
         }
     }
