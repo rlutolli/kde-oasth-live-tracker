@@ -14,9 +14,9 @@
         android:layout_width="44dp"
         android:layout_height="wrap_content"
         android:textColor="#FFAA00"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:fontFamily="monospace" />
+        android:fontFamily="@font/vt323_regular" />
 
     <!-- Destination (amber, fills middle space) -->
     <TextView
@@ -26,10 +26,12 @@
         android:layout_weight="1"
         android:layout_marginStart="4dp"
         android:textColor="#FFAA00"
-        android:textSize="18sp"
-        android:fontFamily="monospace"
-        android:maxLines="1"
-        android:ellipsize="end" />
+        android:textSize="22sp"
+        android:fontFamily="@font/vt323_regular"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true" />
 
     <!-- Arrival indicator Σ -->
     <TextView
@@ -38,10 +40,10 @@
         android:layout_height="wrap_content"
         android:text="Σ"
         android:textColor="#FFAA00"
-        android:textSize="18sp"
-        android:fontFamily="monospace"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp" />
+        android:textSize="22sp"
+        android:fontFamily="@font/vt323_regular"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp" />
 
     <!-- Arrival time -->
     <TextView
@@ -49,8 +51,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFAA00"
-        android:textSize="18sp"
-        android:fontFamily="monospace"
+        android:textSize="22sp"
+        android:fontFamily="@font/vt323_regular"
         android:minWidth="36dp"
         android:gravity="end" />
 

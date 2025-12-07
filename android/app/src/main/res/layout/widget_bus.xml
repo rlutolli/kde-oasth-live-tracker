@@ -26,22 +26,21 @@
             android:textStyle="bold"
             android:fontFamily="monospace" />
 
-        <ImageButton
+        <!-- Refresh button -->
+        <ImageView
             android:id="@+id/widget_refresh"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@android:drawable/stat_notify_sync"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
             android:contentDescription="@string/tap_to_refresh"
-            app:tint="#FF9500" />
+            app:tint="#FFAA00" />
     </LinearLayout>
 
     <!-- Separator line (using TextView because View is not allowed in RemoteViews) -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#4DFF9500" />
+        android:background="#4DFFAA00" />
 
     <!-- Bus arrivals list -->
     <ListView
@@ -49,12 +48,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="4dp"
-        android:divider="#1A1A1A"
-        android:dividerHeight="2dp"
-        android:scrollbars="none"
-        android:cacheColorHint="@android:color/transparent"
-        android:listSelector="@android:color/transparent" />
+        android:divider="@null"
+        android:clipToPadding="false"
+        android:paddingVertical="4dp" />
 
     <!-- Empty state -->
     <TextView
@@ -63,7 +59,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="@string/no_buses"
+        android:text="@string/loading"
         android:textColor="#FFAA00"
         android:textSize="16sp"
         android:fontFamily="monospace"
@@ -84,11 +80,11 @@
             android:layout_height="wrap_content"
             android:text="1052"
             android:textColor="#FF9500"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
             android:background="@drawable/stop_code_box"
-            android:paddingHorizontal="12dp"
+            android:paddingHorizontal="8dp"
             android:paddingVertical="4dp" />
 
         <!-- Stop Name -->
