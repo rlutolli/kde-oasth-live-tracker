@@ -37,12 +37,11 @@
             app:tint="#FF9500" />
     </LinearLayout>
 
-    <!-- Separator line -->
-    <View
+    <!-- Separator line (using TextView because View is not allowed in RemoteViews) -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#FF9500"
-        android:alpha="0.3" />
+        android:background="#4DFF9500" />
 
     <!-- Bus arrivals list -->
     <ListView
