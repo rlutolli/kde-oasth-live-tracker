@@ -6,7 +6,7 @@
     android:paddingVertical="8dp"
     android:paddingHorizontal="4dp"
     android:gravity="center_vertical"
-    android:background="#111111">
+    android:background="@drawable/led_pattern">
 
     <!-- Line number (Bitmap) -->
     <ImageView

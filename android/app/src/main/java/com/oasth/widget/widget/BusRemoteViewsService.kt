@@ -71,7 +71,9 @@ class BusRemoteViewsFactory(
     }
     
     private fun textAsBitmap(text: String, sizeSp: Float, color: Int, maxWidthDp: Int? = null): Bitmap {
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        val paint = Paint() // No ANTI_ALIAS_FLAG for sharp pixels
+        paint.isAntiAlias = false
+        paint.isFilterBitmap = false
         paint.textSize = sizeSp * context.resources.displayMetrics.scaledDensity
         paint.color = color
         paint.typeface = customTypeface ?: Typeface.MONOSPACE
