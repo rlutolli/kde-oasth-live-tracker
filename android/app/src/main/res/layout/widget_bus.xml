@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingBottom="8dp">
+        android:paddingBottom="6dp">
 
         <TextView
             android:id="@+id/widget_stop_name"
@@ -23,22 +23,18 @@
             android:layout_weight="1"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:maxLines="1"
-            android:ellipsize="end"
-            android:shadowColor="#40000000"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2" />
+            android:ellipsize="end" />
 
         <ImageButton
             android:id="@+id/widget_refresh"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@android:drawable/ic_popup_sync"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/tap_to_refresh"
-            app:tint="#FFFFFF" />
+            app:tint="#80FFFFFF" />
     </LinearLayout>
 
     <!-- Bus arrivals list -->
@@ -47,8 +43,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
-        android:dividerHeight="2dp"
-        android:scrollbars="none" />
+        android:dividerHeight="0dp"
+        android:scrollbars="none"
+        android:cacheColorHint="@android:color/transparent"
+        android:listSelector="@android:color/transparent" />
 
     <!-- Empty state -->
     <TextView
@@ -57,8 +55,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="@string/no_buses"
-        android:textColor="#B0FFFFFF"
-        android:textSize="13sp"
+        android:textColor="#80FFFFFF"
+        android:textSize="12sp"
         android:visibility="gone" />
 
 </LinearLayout>

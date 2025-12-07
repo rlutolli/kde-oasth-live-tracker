@@ -3,24 +3,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingHorizontal="12dp"
-    android:paddingVertical="6dp"
+    android:paddingHorizontal="4dp"
+    android:paddingVertical="4dp"
     android:gravity="center_vertical">
 
+    <!-- Line ID with emphasis -->
     <TextView
         android:id="@+id/item_line"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textColor="#FFFFFF"
+        android:textColor="#FFD54F"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:minWidth="48dp" />
 
+    <!-- Separator -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="  -  "
+        android:textColor="#80FFFFFF"
+        android:textSize="14sp" />
+
+    <!-- Arrival time -->
     <TextView
         android:id="@+id/item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#90CAF9"
+        android:textColor="#4FC3F7"
         android:textSize="14sp"
         android:textStyle="bold" />
 
