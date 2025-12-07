@@ -50,4 +50,5 @@
     <string name="header_line">LINE</string>
     <string name="header_destination">DESTINATION</string>
     <string name="header_arrival">ARR</string>
+    <string name="header_line_dest">LINE DESTINATION</string>
 </resources>
