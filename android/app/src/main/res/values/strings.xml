@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OASTH Widget</string>
+    <string name="widget_name">Bus Arrivals</string>
+    <string name="widget_description">Shows real-time bus arrivals for a stop</string>
+    
+    <!-- Widget -->
+    <string name="tap_to_configure">Tap to configure</string>
+    <string name="loading">Loading…</string>
+    <string name="no_buses">No buses</string>
+    <string name="error_loading">Tap to refresh</string>
+    
+    <!-- Config Activity -->
+    <string name="configure_widget">Configure Widget</string>
+    <string name="stop_code_label">Stop Code *</string>
+    <string name="stop_code_hint">e.g. 1029</string>
+    <string name="stop_name_label">Stop Name (optional)</string>
+    <string name="stop_name_hint">e.g. ESPEROS</string>
+    <string name="save">Save</string>
+    <string name="enter_stop_code">Please enter a stop code</string>
+    
+    <!-- Main Activity -->
+    <string name="app_description">Real-time bus arrivals for Thessaloniki</string>
+    <string name="status_title">Session Status</string>
+    <string name="checking_session">Checking session…</string>
+    <string name="session_active">✓ Session active</string>
+    <string name="session_error">Error: %s</string>
+    <string name="widgets_title">Your Widgets</string>
+    <string name="no_widgets_configured">No widgets configured yet.\nLong-press your home screen to add one.</string>
+    <string name="configured_widgets">%d widget(s) configured:</string>
+    <string name="how_to_add">Long-press home screen → Widgets → OASTH Widget</string>
+</resources>
