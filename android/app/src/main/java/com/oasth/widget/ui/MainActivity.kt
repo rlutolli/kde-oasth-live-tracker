@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.oasth.widget.BuildConfig
 import com.oasth.widget.R
 import com.oasth.widget.data.OasthApi
 import com.oasth.widget.data.SessionManager
@@ -20,6 +19,11 @@ import kotlinx.coroutines.launch
  * Main app activity showing info and configured widgets
  */
 class MainActivity : AppCompatActivity() {
+    
+    companion object {
+        // Update this when releasing new versions
+        private const val CURRENT_VERSION = "v1.0.6"
+    }
     
     private lateinit var statusText: TextView
     private lateinit var widgetsText: TextView
@@ -99,14 +103,13 @@ class MainActivity : AppCompatActivity() {
             try {
                 val sessionManager = SessionManager(this@MainActivity)
                 val api = OasthApi(sessionManager)
-                val currentVersion = "v${BuildConfig.VERSION_NAME}"
-                val newVersion = api.checkForUpdate(currentVersion)
+                val newVersion = api.checkForUpdate(CURRENT_VERSION)
                 
                 if (newVersion != null) {
                     updateText.text = "Update available: $newVersion"
                     updateButton.visibility = View.VISIBLE
                 } else {
-                    updateText.text = "✓ Up to date ($currentVersion)"
+                    updateText.text = "✓ Up to date ($CURRENT_VERSION)"
                     updateButton.visibility = View.GONE
                 }
             } catch (e: Exception) {
