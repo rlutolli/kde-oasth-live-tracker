@@ -10,6 +10,7 @@ import com.oasth.widget.R
 import com.oasth.widget.data.BusArrival
 import com.oasth.widget.data.OasthApi
 import com.oasth.widget.data.SessionManager
+import com.oasth.widget.data.StopRepository
 import com.oasth.widget.data.WidgetConfigRepository
 import kotlinx.coroutines.runBlocking
 
