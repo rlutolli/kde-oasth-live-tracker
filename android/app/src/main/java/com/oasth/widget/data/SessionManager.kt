@@ -23,8 +23,7 @@ class SessionManager(private val context: Context) {
         private const val KEY_TOKEN = "token"
         private const val KEY_CREATED_AT = "created_at"
         
-        // Static token discovered through reverse-engineering
-        private const val STATIC_TOKEN = "e2287129f7a2bbae422f3673c4944d703b84a1cf71e189f869de7da527d01137"
+        // Static token removed for security
         
         private const val OASTH_URL = "https://telematics.oasth.gr/en/"
         private const val SESSION_TIMEOUT_MS = 30000L // Increased to 30 seconds
@@ -139,30 +138,22 @@ class SessionManager(private val context: Context) {
      */
     private fun extractCredentials(webView: WebView, callback: (SessionData?) -> Unit) {
         // Extract JavaScript token
-        webView.evaluateJavascript("window.token || '$STATIC_TOKEN'") { tokenResult ->
-            val token = tokenResult?.trim('"') ?: STATIC_TOKEN
+        webView.evaluateJavascript("window.token") { tokenResult ->
+            val token = tokenResult?.trim('"') ?: ""
             
             // Get PHPSESSID from cookies
             val cookies = CookieManager.getInstance().getCookie(OASTH_URL)
             val phpSessionId = extractPhpSessionId(cookies)
             
-            if (phpSessionId != null && token.isNotEmpty()) {
+            if (phpSessionId != null && token.isNotEmpty() && token != "null") {
                 callback(SessionData(
                     phpSessionId = phpSessionId,
                     token = token,
                     createdAt = System.currentTimeMillis()
                 ))
             } else {
-                // Fallback: use static token if we got cookies at least
-                if (phpSessionId != null) {
-                    callback(SessionData(
-                        phpSessionId = phpSessionId,
-                        token = STATIC_TOKEN,
-                        createdAt = System.currentTimeMillis()
-                    ))
-                } else {
-                    callback(null)
-                }
+                // Failed to get dynamic token
+                callback(null)
             }
         }
     }

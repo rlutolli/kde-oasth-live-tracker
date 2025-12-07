@@ -21,7 +21,8 @@ import java.net.URL
 class WidgetConfigActivity : AppCompatActivity() {
     
     companion object {
-        private const val STATIC_TOKEN = "e2287129f7a2bbae422f3673c4944d703b84a1cf71e189f869de7da527d01137"
+        // Static token removed
+        private const val DEFAULT_TOKEN = ""
     }
     
     private var widgetId = AppWidgetManager.INVALID_APPWIDGET_ID
@@ -114,7 +115,7 @@ class WidgetConfigActivity : AppCompatActivity() {
         return try {
             val prefs = getSharedPreferences("oasth_session", MODE_PRIVATE)
             val phpSessionId = prefs.getString("php_session_id", null) ?: return null
-            val token = prefs.getString("token", STATIC_TOKEN) ?: STATIC_TOKEN
+            val token = prefs.getString("token", null) ?: DEFAULT_TOKEN
             
             // Try to get stop name from arrivals response
             val url = URL("https://telematics.oasth.gr/api/?act=getStopArrivals&p1=$stopCode")
