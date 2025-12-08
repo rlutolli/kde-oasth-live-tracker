@@ -89,3 +89,4 @@ The GitHub Actions workflow automatically builds an unsigned IPA on push to `mai
 - **7-day expiration**: Free Apple IDs require re-signing weekly
 - **3 app limit**: Can only have 3 sideloaded apps at once
 - **iOS 16+**: Must enable Developer Mode on device
+# Trigger iOS build
