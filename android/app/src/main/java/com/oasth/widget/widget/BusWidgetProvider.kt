@@ -96,6 +96,11 @@ class BusWidgetProvider : AppWidgetProvider() {
             // Click on List Items -> Toggle (using Template)
             views.setPendingIntentTemplate(R.id.widget_list, togglePendingIntent)
 
+            // Update Timestamp
+            val timeFormat = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+            val timestamp = "Updated ${timeFormat.format(java.util.Date())}"
+            views.setTextViewText(R.id.widget_last_updated, timestamp)
+
             appWidgetManager.updateAppWidget(appWidgetId, views)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list)
         }

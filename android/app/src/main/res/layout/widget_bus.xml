@@ -33,6 +33,16 @@
         android:cacheColorHint="@android:color/transparent"
         android:listSelector="@android:color/transparent" />
     
-    <!-- Bottom accent line -->
-    
+    <!-- Last Updated Timestamp -->
+    <TextView
+        android:id="@+id/widget_last_updated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:text="Updated --:--"
+        android:textColor="#CCFFFFFF"
+        android:textSize="10sp"
+        android:textStyle="italic" />
+
 </LinearLayout>
