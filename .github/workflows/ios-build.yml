@@ -1,0 +1,112 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'ios_app/**'
+      - '.github/workflows/ios-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ios_app/**'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-ios:
+    runs-on: macos-14  # Use latest macOS with Apple Silicon
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+        cache: true
+        
+    - name: Flutter version info
+      run: flutter --version
+      
+    - name: Flutter dependencies
+      working-directory: ios_app
+      run: flutter pub get
+      
+    - name: Create iOS project files
+      working-directory: ios_app
+      run: |
+        # Generate the native iOS project structure
+        flutter create --platforms=ios .
+        
+    - name: Copy Widget Extension files
+      working-directory: ios_app/ios
+      run: |
+        echo "Widget extension files are in BusWidget/"
+        ls -la BusWidget/ || echo "BusWidget folder not found"
+        
+    - name: Update Bundle Identifier (optional)
+      working-directory: ios_app/ios
+      run: |
+        # Update bundle ID in project.pbxproj if needed
+        sed -i '' 's/com.example.oasthLive/com.oasth.live/g' Runner.xcodeproj/project.pbxproj || true
+        
+    - name: Build iOS (unsigned)
+      working-directory: ios_app
+      run: |
+        flutter build ios --release --no-codesign
+        
+    - name: Create IPA archive
+      working-directory: ios_app
+      run: |
+        # Create the Payload directory structure
+        mkdir -p Payload
+        
+        # Copy the .app bundle
+        cp -r build/ios/iphoneos/Runner.app Payload/
+        
+        # Create the IPA (which is just a ZIP file)
+        zip -r OASTH-Live.ipa Payload
+        
+        # Cleanup
+        rm -rf Payload
+        
+        # Show result
+        ls -la OASTH-Live.ipa
+        
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: oasth-live-ios
+        path: ios_app/OASTH-Live.ipa
+        retention-days: 30
+        
+  # Release job (only on tagged releases)
+  release:
+    needs: build-ios
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - name: Download IPA
+      uses: actions/download-artifact@v4
+      with:
+        name: oasth-live-ios
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: OASTH-Live.ipa
+        name: "OASTH Live iOS ${{ github.ref_name }}"
+        body: |
+          ## iOS Release
+          
+          Download `OASTH-Live.ipa` and sideload with:
+          - [AltStore/AltServer](https://altstore.io/)
+          - [Sideloadly](https://sideloadly.io/)
+          - [AltLinux](https://github.com/NyaMisty/AltLinux) (for Linux)
+          
+          **Note:** Free Apple ID requires re-signing every 7 days.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
