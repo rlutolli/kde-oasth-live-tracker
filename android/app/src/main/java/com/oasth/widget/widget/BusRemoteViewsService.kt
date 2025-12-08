@@ -76,20 +76,8 @@ class BusRemoteViewsFactory(
         Log.d(TAG, "Config: rawCode='${config.stopCode}', parsedIds=$streetIds")
         
         // 2. Parse Filters (e.g. "1403:01N,05; 1024:10")
-        val filterMap = mutableMapOf<String, Set<String>>()
-        if (config.lineFilters.isNotEmpty()) {
-            val rules = config.lineFilters.split(";")
-            for (rule in rules) {
-                if (rule.contains(":")) {
-                    val parts = rule.split(":")
-                    if (parts.size == 2) {
-                        val sId = parts[0].trim()
-                        val lines = parts[1].split(",").map { it.trim() }.toSet()
-                        filterMap[sId] = lines
-                    }
-                }
-            }
-        }
+        // 2. Parse Filters (e.g. "1403:01N,05; 1024:10")
+        val filterMap = com.oasth.widget.logic.FilterLogic.parseFilters(config.lineFilters)
         Log.d(TAG, "Filters: raw='${config.lineFilters}', map=$filterMap")
         
         // 3. Update Loop
@@ -109,13 +97,9 @@ class BusRemoteViewsFactory(
                     Log.d(TAG, "Fetched ${arrivals.size} arrivals for $streetId (API: $apiId)")
                     
                     // Filter
-                    val validArrivals = if (filterMap.containsKey(streetId)) {
-                        val allowedLines = filterMap[streetId]!!
-                        val filtered = arrivals.filter { it.displayLine in allowedLines }
-                        Log.d(TAG, "Filtered $streetId: kept ${filtered.size} of ${arrivals.size}. Allowed: $allowedLines")
-                        filtered
-                    } else {
-                        arrivals
+                    val validArrivals = com.oasth.widget.logic.FilterLogic.filterArrivals(streetId, arrivals, filterMap)
+                    if (validArrivals.size != arrivals.size) {
+                        Log.d(TAG, "Filtered $streetId: kept ${validArrivals.size} of ${arrivals.size}")
                     }
                     
                     if (validArrivals.isNotEmpty()) {

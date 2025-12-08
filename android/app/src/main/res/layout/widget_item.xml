@@ -11,7 +11,7 @@
     <!-- Line Number Box -->
     <TextView
         android:id="@+id/item_line"
-        android:layout_width="30dp"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
         android:text="01N"
         android:textColor="#FFD700"
