@@ -75,14 +75,21 @@ class BusRemoteViewsFactory(
         val streetIds = config.stopCode.split(",").map { it.trim() }.filter { it.isNotEmpty() }
         Log.d(TAG, "Config: rawCode='${config.stopCode}', parsedIds=$streetIds")
         
-        // 2. Parse Filters (e.g. "1403:01N,05; 1024:10")
-        // 2. Parse Filters (e.g. "1403:01N,05; 1024:10")
+        // 2. Parse Filters
         val filterMap = com.oasth.widget.logic.FilterLogic.parseFilters(config.lineFilters)
         Log.d(TAG, "Filters: raw='${config.lineFilters}', map=$filterMap")
         
         // 3. Update Loop
         runBlocking {
             for (streetId in streetIds) {
+                // Check Network Availability
+                if (!com.oasth.widget.utils.NetworkUtils.isNetworkAvailable(context)) {
+                    Log.e(TAG, "No network connection for $streetId")
+                    items.add(WidgetItem.Header("Stop $streetId"))
+                    items.add(WidgetItem.Row("", "No Internet"))
+                    continue
+                }
+
                 try {
                     Log.d(TAG, "Processing StreetID: '$streetId'")
                     
@@ -90,17 +97,19 @@ class BusRemoteViewsFactory(
                     val apiId = stopRepo.getApiId(streetId)
                     val stopName = stopRepo.getStopName(streetId) ?: "Stop $streetId"
                     
-                    // Fetch Arrivals and deduplicate by Vehicle Code
-                    val arrivals = api.getArrivals(apiId).distinctBy { 
+                    // Fetch Arrivals with Timeout
+                    val result = kotlinx.coroutines.withTimeout(15000L) {
+                        api.getArrivals(apiId)
+                    }
+                    Log.d(TAG, "Fetched ${result.size} arrivals for $streetId (API: $apiId)")
+                    
+                    // Deduplicate
+                    val unique = result.distinctBy { 
                         if (it.vehicleCode.isNotBlank()) it.vehicleCode else it.hashCode() 
                     }
-                    Log.d(TAG, "Fetched ${arrivals.size} arrivals for $streetId (API: $apiId)")
                     
                     // Filter
-                    val validArrivals = com.oasth.widget.logic.FilterLogic.filterArrivals(streetId, arrivals, filterMap)
-                    if (validArrivals.size != arrivals.size) {
-                        Log.d(TAG, "Filtered $streetId: kept ${validArrivals.size} of ${arrivals.size}")
-                    }
+                    val validArrivals = com.oasth.widget.logic.FilterLogic.filterArrivals(streetId, unique, filterMap)
                     
                     if (validArrivals.isNotEmpty()) {
                         // Header with Stop Code
@@ -122,12 +131,15 @@ class BusRemoteViewsFactory(
                             items.add(WidgetItem.Row(line, timeString))
                         }
                     } else {
-                        // User request: just "same line vertically".
-                        // If no buses, let's show one header and "No buses" row so user knows it loaded
+                        // Header + Empty Row
                          items.add(WidgetItem.Header("$stopName ($streetId)"))
                          items.add(WidgetItem.Row("", "No buses"))
                     }
                     
+                } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                    Log.e(TAG, "Timeout fetching $streetId")
+                    items.add(WidgetItem.Header("Stop $streetId"))
+                    items.add(WidgetItem.Row("Err", "Timeout"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching for $streetId: ${e.message}")
                     items.add(WidgetItem.Header("Stop $streetId"))
@@ -135,6 +147,7 @@ class BusRemoteViewsFactory(
                 }
             }
         }
+
         
         Log.d(TAG, "=== onDataSetChanged END (${items.size} items) ===")
     }
