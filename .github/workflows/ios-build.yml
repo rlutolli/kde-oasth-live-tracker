@@ -40,33 +40,26 @@ jobs:
         # Generate the native iOS project structure
         flutter create --platforms=ios .
         
-        # Show what was created
-        ls -la ios/
-        
-    - name: Install xcodeproj gem
-      run: |
-        gem install xcodeproj
-        
-    - name: Copy widget Swift files to generated project
+    - name: Setup App Group entitlements
       working-directory: ios_app
       run: |
-        # Ensure BusWidget folder exists in ios/
-        mkdir -p ios/BusWidget
+        # Create entitlements file for App Groups
+        mkdir -p ios/Runner
         
-        # Copy our Swift widget files
-        if [ -f "ios/BusWidget/BusWidget.swift" ]; then
-          echo "Widget Swift files already in place"
-        else
-          echo "Widget Swift files should be in ios/BusWidget/"
-        fi
+        cat > ios/Runner/Runner.entitlements << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>com.apple.security.application-groups</key>
+            <array>
+                <string>group.com.oasth.widget</string>
+            </array>
+        </dict>
+        </plist>
+        EOF
         
-        ls -la ios/BusWidget/ || echo "BusWidget folder empty or missing"
-        
-    - name: Setup widget extension (automated)
-      working-directory: ios_app
-      run: |
-        # Run our automated Xcode project configuration
-        ruby scripts/setup_widget_extension.rb
+        echo "✓ Created App Group entitlements"
         
     - name: Build iOS (unsigned)
       working-directory: ios_app
@@ -82,13 +75,8 @@ jobs:
         # Copy the .app bundle
         cp -r build/ios/iphoneos/Runner.app Payload/
         
-        # Check if widget extension was built
-        if [ -d "build/ios/iphoneos/BusWidget.appex" ]; then
-          echo "✓ Widget extension was built"
-          cp -r build/ios/iphoneos/BusWidget.appex Payload/Runner.app/PlugIns/
-        else
-          echo "⚠ Widget extension not found in build output"
-        fi
+        # Rename to OASTH Live
+        # Note: The app name is set in the Flutter project
         
         # Create the IPA (which is just a ZIP file)
         zip -r OASTH-Live.ipa Payload
@@ -104,6 +92,14 @@ jobs:
       with:
         name: oasth-live-ios
         path: ios_app/OASTH-Live.ipa
+        retention-days: 30
+
+    - name: Upload Widget Swift files (for manual setup)
+      uses: actions/upload-artifact@v4
+      with:
+        name: widget-swift-files
+        path: |
+          ios_app/ios/BusWidget/
         retention-days: 30
         
   # Release job (only on tagged releases)
@@ -131,11 +127,8 @@ jobs:
           - [Sideloadly](https://sideloadly.io/)
           - [AltLinux](https://github.com/NyaMisty/AltLinux) (for Linux)
           
-          **Features:**
-          - 📱 Two widget variants: Standard & Compact
-          - 🎨 LED-style display matching Android
-          - 🔴🟢 Urgency colors (Compact widget)
-          - 🔍 Line filtering
+          **Note:** This build is the main app without widget extension.
+          Widget extension requires manual Xcode setup due to Flutter limitations.
           
           **Note:** Free Apple ID requires re-signing every 7 days.
       env:
