@@ -150,7 +150,13 @@ class MinimalRemoteViewsFactory(
             }
             
             Log.d(TAG, "After filtering: ${filtered.size} arrivals")
-            arrivals.addAll(filtered.sortedBy { it.estimatedMinutes })
+            
+            // Deduplicate: same vehicle shouldn't appear twice
+            val unique = filtered.distinctBy { 
+                if (it.vehicleCode.isNotBlank()) it.vehicleCode else it.hashCode() 
+            }
+            
+            arrivals.addAll(unique.sortedBy { it.estimatedMinutes })
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching arrivals: ${e.message}", e)
         }
