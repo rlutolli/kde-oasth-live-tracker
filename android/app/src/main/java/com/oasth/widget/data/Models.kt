@@ -65,7 +65,14 @@ data class SessionData(
  */
 data class WidgetConfig(
     val widgetId: Int,
-    val stopCode: String, // Comma-separated API IDs
+    val stopCode: String, // Legacy: Comma-separated
+    val stopName: String, // Legacy
+    val lineFilters: String = "", // Legacy
+    val configJson: String = "" // New: JSON List of StopConfigItem
+)
+
+data class StopConfigItem(
+    val streetId: String,
     val stopName: String,
-    val lineFilters: String = "" // Whitelist: "STREET_ID:LINE1,LINE2;..."
+    val selectedLines: List<String> = emptyList() // Empty = All lines
 )

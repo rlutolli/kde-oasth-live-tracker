@@ -71,21 +71,18 @@ class BusRemoteViewsFactory(
             return
         }
         
-        // 1. Parse Stops (Comma separated Street IDs)
-        val streetIds = config.stopCode.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-        Log.d(TAG, "Config: rawCode='${config.stopCode}', parsedIds=$streetIds")
+        // 1. Get Smart Config
+        val stopItems = configRepo.getSmartConfig(appWidgetId)
         
-        // 2. Parse Filters
-        val filterMap = com.oasth.widget.logic.FilterLogic.parseFilters(config.lineFilters)
-        Log.d(TAG, "Filters: raw='${config.lineFilters}', map=$filterMap")
-        
-        // 3. Update Loop
+        // 2. Loop through config items
         runBlocking {
-            for (streetId in streetIds) {
+            for (item in stopItems) {
+                val streetId = item.streetId
+                
                 // Check Network Availability
                 if (!com.oasth.widget.utils.NetworkUtils.isNetworkAvailable(context)) {
                     Log.e(TAG, "No network connection for $streetId")
-                    items.add(WidgetItem.Header("Stop $streetId"))
+                    items.add(WidgetItem.Header(item.stopName))
                     items.add(WidgetItem.Row("", "No Internet"))
                     continue
                 }
@@ -93,27 +90,29 @@ class BusRemoteViewsFactory(
                 try {
                     Log.d(TAG, "Processing StreetID: '$streetId'")
                     
-                    // Resolve ID and Name locally
                     val apiId = stopRepo.getApiId(streetId)
-                    val stopName = stopRepo.getStopName(streetId) ?: "Stop $streetId"
                     
                     // Fetch Arrivals with Timeout
                     val result = kotlinx.coroutines.withTimeout(15000L) {
                         api.getArrivals(apiId)
                     }
-                    Log.d(TAG, "Fetched ${result.size} arrivals for $streetId (API: $apiId)")
                     
                     // Deduplicate
                     val unique = result.distinctBy { 
                         if (it.vehicleCode.isNotBlank()) it.vehicleCode else it.hashCode() 
                     }
                     
-                    // Filter
-                    val validArrivals = com.oasth.widget.logic.FilterLogic.filterArrivals(streetId, unique, filterMap)
+                    // Filter: Use item.selectedLines
+                    // If empty, ALL lines are allowed. If not empty, ONLY those in list.
+                    val allowedLines = item.selectedLines.toSet()
+                    
+                    val validArrivals = unique.filter { 
+                         allowedLines.isEmpty() || allowedLines.contains(it.displayLine)
+                    }
                     
                     if (validArrivals.isNotEmpty()) {
-                        // Header with Stop Code
-                        items.add(WidgetItem.Header("$stopName ($streetId)"))
+                        // Header
+                        items.add(WidgetItem.Header("${item.stopName} ($streetId)"))
                         
                         // Group by Line
                         val grouped = validArrivals.groupBy { it.displayLine }
@@ -132,17 +131,17 @@ class BusRemoteViewsFactory(
                         }
                     } else {
                         // Header + Empty Row
-                         items.add(WidgetItem.Header("$stopName ($streetId)"))
+                         items.add(WidgetItem.Header("${item.stopName} ($streetId)"))
                          items.add(WidgetItem.Row("", "No buses"))
                     }
                     
                 } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
                     Log.e(TAG, "Timeout fetching $streetId")
-                    items.add(WidgetItem.Header("Stop $streetId"))
+                    items.add(WidgetItem.Header(item.stopName))
                     items.add(WidgetItem.Row("Err", "Timeout"))
                 } catch (e: Exception) {
                     Log.e(TAG, "Error fetching for $streetId: ${e.message}")
-                    items.add(WidgetItem.Header("Stop $streetId"))
+                     items.add(WidgetItem.Header(item.stopName))
                     items.add(WidgetItem.Row("Err", "Load failed"))
                 }
             }
